@@ -19,14 +19,41 @@ class HomePageState extends State<HomePage>
 {
   int currentIndex = 0; 
   
-  List<UpcomingSchedule> _availableSchedules = [];
+  List<UpcomingSchedule> _allSchedules = [];
   bool _isLoading = true;
+
+  static const List<String> _routeOptions = ['Tokyo Riverside - PIK Avenue', 'PIK Avenue - Tokyo Riverside'];
+  String? _selectedRouteFilter;
 
   @override
   void initState()
   {
     super.initState();
     _loadAvailableSchedules(); 
+  }
+
+  List<UpcomingSchedule> get _availableSchedules
+  {
+    if (_selectedRouteFilter == null)
+    {
+      return _allSchedules; // Show all
+    }
+    return _allSchedules.where((schedule) => schedule.route == _selectedRouteFilter).toList();
+  }
+  
+  void _setRouteFilter(String? route)
+  {
+    setState(()
+    {
+      if (_selectedRouteFilter == route)
+      {
+        _selectedRouteFilter = null;
+      }
+      else
+      {
+        _selectedRouteFilter = route;
+      }
+    });
   }
 
   void onItemTapped(int index)
@@ -99,7 +126,7 @@ class HomePageState extends State<HomePage>
 
       setState(()
       {
-        _availableSchedules = generatedSchedules;
+        _allSchedules = generatedSchedules;
         _isLoading = false;
       });
     }
@@ -160,9 +187,22 @@ class HomePageState extends State<HomePage>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  'Keberangkatan pukul ${DateFormat('HH:mm').format(schedule.departure)}', 
-                  style: AppTextStyles.mainFont15,
+                RichText(
+                  text: TextSpan(
+                    style: AppTextStyles.mainFont15,
+                    children: <TextSpan>
+                    [
+                      const TextSpan(text: 'Keberangkatan pukul '),
+                      TextSpan(
+                        text: DateFormat('HH:mm').format(schedule.departure),
+                        style: AppTextStyles.mainFont15.copyWith(
+                          color: AppColors.hover,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -223,6 +263,44 @@ class HomePageState extends State<HomePage>
                       children:
                       [
                         Text("Jadwal Bis", style: AppTextStyles.mainFont20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Tujuan akhir : ",
+                              style: AppTextStyles.mainFont15.copyWith(
+                                color: AppColors.mainText
+                              ),
+                            ),
+                            Row(
+                              children: _routeOptions.map((route)
+                              {
+                                Text("Tujuan Akhir :", style: AppTextStyles.mainFont15);
+                                final isSelected = _selectedRouteFilter == route;
+                                
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () => _setRouteFilter(route),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isSelected ? AppColors.secondary : AppColors.primary,
+                                      foregroundColor: isSelected ? AppColors.primary : AppColors.mainText,
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                      minimumSize: const Size(0, 30),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                      elevation: 0,
+                                    ),
+                                    child: Text(
+                                      route.split(' - ').last, 
+                                      style: AppTextStyles.mainFont15.copyWith(fontSize: 14),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+
                         const SizedBox(height: 15),
 
                         if (_availableSchedules.isEmpty)
