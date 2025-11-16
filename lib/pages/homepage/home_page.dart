@@ -96,12 +96,10 @@ class HomePageState extends State<HomePage>
         }
       }
       generatedSchedules.sort((a, b) => a.departure.compareTo(b.departure));
-      
-      final List<UpcomingSchedule> nextFive = generatedSchedules.take(5).toList();
 
       setState(()
       {
-        _availableSchedules = nextFive;
+        _availableSchedules = generatedSchedules;
         _isLoading = false;
       });
     }
@@ -129,14 +127,10 @@ class HomePageState extends State<HomePage>
       decoration: BoxDecoration(
         color: AppColors.box,
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow:
-        [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 2,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: AppColors.mainText,
+          width: 1.0
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center, 
@@ -194,8 +188,7 @@ class HomePageState extends State<HomePage>
 
     return _isLoading
       ? const Center(child: CircularProgressIndicator(color: AppColors.secondary))
-      : SingleChildScrollView(
-          child: Padding(
+      : Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,54 +203,58 @@ class HomePageState extends State<HomePage>
                 ),
                 const SizedBox(height: 15),
 
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.box,
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow:
-                    [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 3,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                    [
-                      Text("Jadwal Bis", style: AppTextStyles.mainFont20),
-                      const SizedBox(height: 15),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.box,
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow:
+                      [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 3,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:
+                      [
+                        Text("Jadwal Bis", style: AppTextStyles.mainFont20),
+                        const SizedBox(height: 15),
 
-                      if (_availableSchedules.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            "No available bus schedules remaining for today.",
-                            style: AppTextStyles.mainFont20.copyWith(fontStyle: FontStyle.italic),
+                        if (_availableSchedules.isEmpty)
+                        Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Text(
+                              "No available bus schedules remaining for today.",
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.mainFont20.copyWith(fontStyle: FontStyle.italic),
+                            ),
                           ),
                         ),
                       )
-                      else
-                      // Map the available schedules to the bus schedule cards
-                      ..._availableSchedules.map((schedule)
-                      {
-                        return Column(
-                          children: [
-                            _busSchedule(schedule),
-                            const SizedBox(height: 10),
-                          ],
-                        );
-                      }).toList(),
-                    ]
+                        else
+                        Expanded( 
+                        child: ListView.separated(
+                          itemCount: _availableSchedules.length, 
+                          separatorBuilder: (context, index) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final schedule = _availableSchedules[index];
+                            return _busSchedule(schedule);
+                          },
+                        ),
+                      ),
+                      ]
+                    )
                   )
                 )
               ],
             ),
-          ),
         );
   }
 }
