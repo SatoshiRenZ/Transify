@@ -42,5 +42,5 @@ class AppTextStyles
 
 class AppIcons
 {
-  static const bus = Icons.directions_bus_rounded;
+  static const bus = Icons.directions_bus;
 }

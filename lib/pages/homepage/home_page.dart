@@ -19,14 +19,41 @@ class HomePageState extends State<HomePage>
 {
   int currentIndex = 0; 
   
-  List<UpcomingSchedule> _availableSchedules = [];
+  List<UpcomingSchedule> _allSchedules = [];
   bool _isLoading = true;
+
+  static const List<String> _routeOptions = ['Tokyo Riverside - PIK Avenue', 'PIK Avenue - Tokyo Riverside'];
+  String? _selectedRouteFilter;
 
   @override
   void initState()
   {
     super.initState();
     _loadAvailableSchedules(); 
+  }
+
+  List<UpcomingSchedule> get _availableSchedules
+  {
+    if (_selectedRouteFilter == null)
+    {
+      return _allSchedules; // Show all
+    }
+    return _allSchedules.where((schedule) => schedule.route == _selectedRouteFilter).toList();
+  }
+  
+  void _setRouteFilter(String? route)
+  {
+    setState(()
+    {
+      if (_selectedRouteFilter == route)
+      {
+        _selectedRouteFilter = null;
+      }
+      else
+      {
+        _selectedRouteFilter = route;
+      }
+    });
   }
 
   void onItemTapped(int index)
@@ -96,12 +123,10 @@ class HomePageState extends State<HomePage>
         }
       }
       generatedSchedules.sort((a, b) => a.departure.compareTo(b.departure));
-      
-      final List<UpcomingSchedule> nextFive = generatedSchedules.take(5).toList();
 
       setState(()
       {
-        _availableSchedules = nextFive;
+        _allSchedules = generatedSchedules;
         _isLoading = false;
       });
     }
@@ -129,14 +154,10 @@ class HomePageState extends State<HomePage>
       decoration: BoxDecoration(
         color: AppColors.box,
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow:
-        [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 2,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: AppColors.mainText,
+          width: 1.0
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center, 
@@ -166,9 +187,22 @@ class HomePageState extends State<HomePage>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  'Keberangkatan pukul ${DateFormat('HH:mm').format(schedule.departure)}', 
-                  style: AppTextStyles.mainFont15,
+                RichText(
+                  text: TextSpan(
+                    style: AppTextStyles.mainFont15,
+                    children: <TextSpan>
+                    [
+                      const TextSpan(text: 'Keberangkatan pukul '),
+                      TextSpan(
+                        text: DateFormat('HH:mm').format(schedule.departure),
+                        style: AppTextStyles.mainFont15.copyWith(
+                          color: AppColors.hover,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -194,8 +228,7 @@ class HomePageState extends State<HomePage>
 
     return _isLoading
       ? const Center(child: CircularProgressIndicator(color: AppColors.secondary))
-      : SingleChildScrollView(
-          child: Padding(
+      : Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,54 +243,96 @@ class HomePageState extends State<HomePage>
                 ),
                 const SizedBox(height: 15),
 
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.box,
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow:
-                    [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 3,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                    [
-                      Text("Jadwal Bis", style: AppTextStyles.mainFont20),
-                      const SizedBox(height: 15),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.box,
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow:
+                      [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 3,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:
+                      [
+                        Text("Jadwal Bis", style: AppTextStyles.mainFont20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Tujuan akhir : ",
+                              style: AppTextStyles.mainFont15.copyWith(
+                                color: AppColors.mainText
+                              ),
+                            ),
+                            Row(
+                              children: _routeOptions.map((route)
+                              {
+                                Text("Tujuan Akhir :", style: AppTextStyles.mainFont15);
+                                final isSelected = _selectedRouteFilter == route;
+                                
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: ElevatedButton(
+                                    onPressed: () => _setRouteFilter(route),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isSelected ? AppColors.secondary : AppColors.primary,
+                                      foregroundColor: isSelected ? AppColors.primary : AppColors.mainText,
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                      minimumSize: const Size(0, 30),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                      elevation: 0,
+                                    ),
+                                    child: Text(
+                                      route.split(' - ').last, 
+                                      style: AppTextStyles.mainFont15.copyWith(fontSize: 14),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
 
-                      if (_availableSchedules.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Text(
-                            "No available bus schedules remaining for today.",
-                            style: AppTextStyles.mainFont20.copyWith(fontStyle: FontStyle.italic),
+                        const SizedBox(height: 15),
+
+                        if (_availableSchedules.isEmpty)
+                        Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Text(
+                              "No available bus schedules remaining for today.",
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.mainFont20.copyWith(fontStyle: FontStyle.italic),
+                            ),
                           ),
                         ),
                       )
-                      else
-                      // Map the available schedules to the bus schedule cards
-                      ..._availableSchedules.map((schedule)
-                      {
-                        return Column(
-                          children: [
-                            _busSchedule(schedule),
-                            const SizedBox(height: 10),
-                          ],
-                        );
-                      }).toList(),
-                    ]
+                        else
+                        Expanded( 
+                        child: ListView.separated(
+                          itemCount: _availableSchedules.length, 
+                          separatorBuilder: (context, index) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final schedule = _availableSchedules[index];
+                            return _busSchedule(schedule);
+                          },
+                        ),
+                      ),
+                      ]
+                    )
                   )
                 )
               ],
             ),
-          ),
         );
   }
 }

@@ -36,7 +36,7 @@ class CustomBottomNavBar extends StatelessWidget {
             index: 2,
           ),
           buildNavItem(
-            icon: Icons.person_outline,
+            icon: Icons.person_outline_rounded,
             activeIcon: Icons.person,
             index: 3,
           ),
