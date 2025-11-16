@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Warna yang digunakan
+//Primary colors
 const Color primaryColor = Color(0xFFFEF3E2);
 const Color secondaryColor = Color(0xFFF3C623);
 const Color boxColor = Color(0xFFFFFFFF);
