@@ -1,36 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Warna yang digunakan
-const Color primaryColor = Color(0xFFFEF3E2);
-const Color secondaryColor = Color(0xFFF3C623);
-const Color boxColor = Color(0xFFFFFFFF);
-const Color hoverColor = Color(0xFFFFB22C);
-const Color mainTextColor = Color(0xFF102E50);
+// --- App Theme Constants ---
 
-TextStyle appBarTitle = GoogleFonts.irishGrover(
-  fontSize: 40.0,
-  fontWeight: FontWeight.normal,
-  color: mainTextColor,
-);
+class AppColors
+{
+  static const Color primary = Color(0xFFFEF3E2);
+  static const Color secondary = Color(0xFFF3C623);
+  static const Color box = Color(0xFFFFFFFF);
+  static const Color hover = Color(0xFFFFB22C);
+  static const Color mainText = Color(0xFF102E50);
+}
 
-// Main font: "Sulphur Point", 35px
-TextStyle mainFontLarge = GoogleFonts.sulphurPoint(
-  fontSize: 35.0,
-  color: mainTextColor,
-  fontWeight: FontWeight.bold,
-);
+class AppTextStyles
+{
+  static final TextStyle title = GoogleFonts.irishGrover(
+    fontSize: 40,
+    color: AppColors.mainText,
+  );
 
-// Main font: "Sulphur Point", 20px
-TextStyle mainFontMedium = GoogleFonts.sulphurPoint(
-  fontSize: 20.0,
-  color: mainTextColor,
-  fontWeight: FontWeight.normal,
-);
+  static final TextStyle mainFont35 = GoogleFonts.sulphurPoint(
+    fontSize: 35,
+    color: AppColors.mainText,
+  );
 
-// Main font: "Sulphur Point", 15px
-TextStyle mainFontSmall = GoogleFonts.sulphurPoint(
-  fontSize: 15.0,
-  color: mainTextColor,
-  fontWeight: FontWeight.normal,
-);
+  static final TextStyle mainFont25 = GoogleFonts.sulphurPoint(
+    fontSize: 25,
+    color: AppColors.mainText,
+  );
+
+  static final TextStyle mainFont20 = GoogleFonts.sulphurPoint(
+    fontSize: 20,
+    color: AppColors.mainText,
+  );
+
+  static final TextStyle mainFont15 = GoogleFonts.sulphurPoint(
+    fontSize: 15,
+    color: AppColors.mainText,
+  );
+}
+
+class AppIcons
+{
+  static const bus = Icons.directions_bus_rounded;
+}

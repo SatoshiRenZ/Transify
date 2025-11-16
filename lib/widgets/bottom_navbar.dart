@@ -16,7 +16,7 @@ class CustomBottomNavBar extends StatelessWidget {
     return Container(
       height: 65,
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      color: secondaryColor,
+      color: AppColors.secondary,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -61,13 +61,13 @@ class CustomBottomNavBar extends StatelessWidget {
           vertical: 8
         ),
         decoration: BoxDecoration(
-          color: isSelected ? hoverColor :Colors.transparent,
+          color: isSelected ? AppColors.hover :Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           isSelected ? activeIcon : icon,
           size: 28,
-          color: mainTextColor,
+          color: AppColors.mainText,
         ),
       ),
     );

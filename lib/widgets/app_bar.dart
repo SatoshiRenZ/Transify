@@ -8,11 +8,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor:
-        secondaryColor,
+        AppColors.secondary,
       elevation: 0,
       title: Text(
         'Transify',
-        style: appBarTitle, 
+        style: AppTextStyles.title, 
       ),
       centerTitle: true,
     );

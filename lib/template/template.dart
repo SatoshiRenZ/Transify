@@ -23,7 +23,7 @@ class TemplatePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-        primaryColor,
+        AppColors.primary,
       appBar: 
         showAppBar
           ? const CustomAppBar()
