@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import '../template/template.dart';
 import '../styles/style.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({Key? key}) : super(key: key);
+class SchedulePage extends StatefulWidget {
+  const SchedulePage({Key? key}) : super(key: key);
 
   @override
-  HistoryPageState createState() => HistoryPageState();
+  SchedulePageState createState() => SchedulePageState();
 }
 
-class HistoryPageState extends State<HistoryPage> {
-  int currentIndex = 2; // Karena ini halaman History, index bottom bar-nya adalah 2
+class SchedulePageState extends State<SchedulePage> {
+  int currentIndex = 1; // Karena ini halaman Order/Jadwal
 
   void onItemTapped(int index) {
     final String? currentRoute = ModalRoute.of(context)?.settings.name;
@@ -20,10 +20,10 @@ class HistoryPageState extends State<HistoryPage> {
         destinationRoute = '/home';
         break;
       case 1:
-        destinationRoute = '/order';
+        destinationRoute = '/order'; // Route untuk halaman ini
         break;
       case 2:
-        destinationRoute = '/history'; // Route untuk halaman ini
+        destinationRoute = '/history';
         break;
       case 3:
         destinationRoute = '/profile';
@@ -41,128 +41,123 @@ class HistoryPageState extends State<HistoryPage> {
     return TemplatePage(
       currentIndex: currentIndex,
       onIndexChanged: onItemTapped,
-      child: buildHistoryContent(),
+      child: buildScheduleContent(),
     );
   }
 
-  Widget buildHistoryContent() {
-    return Column(
-      children: [
-        // Header Section
-        Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFD700), // Warna kuning keemasan
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
+  Widget buildScheduleContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Judul & Tujuan
+          Text(
+            'Jadwal Bis',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 8),
+          Row(
             children: [
-              Center(
-                child: Text(
-                  'Transify',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
               Text(
-                'History Transaction',
+                'Tujuan akhir : ',
                 style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  fontSize: 14,
+                  color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Look back into your past transactions.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black.withOpacity(0.7),
-                ),
-              ),
+              const SizedBox(width: 8),
+              _buildDestinationChip('PIK Avenue'),
+              const SizedBox(width: 8),
+              _buildDestinationChip('Tokyo Riverside'),
             ],
           ),
-        ),
-        const SizedBox(height: 20),
-        // Daftar Transaksi
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: 4, // Jumlah transaksi contoh
-            itemBuilder: (context, index) {
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      // Ikon Bus
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE3F2FD),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.directions_bus,
-                          color: Colors.blue[800],
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // Detail Transaksi
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Grogol - Jonggol',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Selasa, 2 November 2025',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black.withOpacity(0.7),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Keberangkatan pukul 01:00',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          const SizedBox(height: 20),
+          // Daftar Jadwal
+          Expanded(
+            child: ListView.builder(
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                final schedule = _getScheduleData(index);
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: Colors.grey.shade300),
                   ),
-                ),
-              );
-            },
+                  elevation: 0,
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.directions_bus,
+                      color: Colors.blue[800],
+                      size: 32,
+                    ),
+                    title: Text(
+                      '${schedule['route']}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Keberangkatan pukul ${schedule['time']}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  Widget _buildDestinationChip(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.orange[50],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          color: Colors.orange[800],
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Map<String, String> _getScheduleData(int index) {
+    final List<Map<String, String>> data = [
+      {
+        'route': 'Tokyo Riverside - PIK Avenue',
+        'time': '20:40',
+      },
+      {
+        'route': 'PIK Avenue - Tokyo Riverside',
+        'time': '20:59',
+      },
+      {
+        'route': 'Tokyo Riverside - PIK Avenue',
+        'time': '21:00',
+      },
+      {
+        'route': 'PIK Avenue - Tokyo Riverside',
+        'time': '21:15', // Contoh tambahan
+      },
+    ];
+    return data[index];
   }
 }
