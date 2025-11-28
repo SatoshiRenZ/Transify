@@ -157,6 +157,22 @@ class SchedulePageState extends State<SchedulePage> {
         'route': 'PIK Avenue - Tokyo Riverside',
         'time': '21:15', // Contoh tambahan
       },
+      {
+        'route': 'PIK Avenue - Tokyo Riverside',
+        'time': '11:45',
+      },
+      {
+        'route': 'Tokyo Riverside - PIK Avenue',
+        'time': '12:30',
+      },
+      {
+        'route': 'PIK Avenue - Tokyo Riverside',
+        'time': '13:15',
+      },
+      {
+        'route': 'Tokyo Riverside - PIK Avenue',
+        'time': '14:00',
+      }
     ];
     return data[index];
   }
