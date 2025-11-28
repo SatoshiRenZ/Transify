@@ -85,8 +85,6 @@ class OrderPageState extends State<OrderPage> {
     }
   }
 
-  
-
   void onItemTapped(int index) {
     final String? currentRoute = ModalRoute.of(context)?.settings.name;
     String destinationRoute;
@@ -126,21 +124,20 @@ class OrderPageState extends State<OrderPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Page Title
           Text('Pilih Jadwal Keberangkatan', style: AppTextStyles.title),
           const SizedBox(height: 30),
 
-          // Route Selection
+          // Memilih Rute Bus
           Text('Pilih Rute Keberangkatan', style: AppTextStyles.mainFont20),
           const SizedBox(height: 10),
-          
+
           Container(
             decoration: BoxDecoration(
               color: AppColors.box,
               border: Border.all(color: AppColors.secondary, width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
-            
+
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 isExpanded: true,
@@ -177,10 +174,12 @@ class OrderPageState extends State<OrderPage> {
 
           const SizedBox(height: 20),
 
+          // Memilih Tanggal Keberangkatan
           Text('Pilih Tanggal Keberangkatan', style: AppTextStyles.mainFont20),
           const SizedBox(height: 10),
 
           GestureDetector(
+            onTap: () => pilihTanggal(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               decoration: BoxDecoration(
