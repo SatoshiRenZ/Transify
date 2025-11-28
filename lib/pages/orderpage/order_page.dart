@@ -49,6 +49,9 @@ class OrderPageState extends State<OrderPage> {
             .where((item) => item['route'] == route)
             .map((item) => {'name': item['name'], 'time': item['time']})
             .toList();
+
+        // Filter waktu jika tanggal sudah dipilih
+        filterWaktu();
       } else {
         waktuTersedia = [];
       }
@@ -82,6 +85,38 @@ class OrderPageState extends State<OrderPage> {
           onRouteSelected(rutePilihan);
         }
       });
+    }
+  }
+
+  // Fungsi untuk filter jam bus
+  void filterWaktu() {
+    if (tanggalPilihan != null) {
+      final now = DateTime.now();
+      final today =
+          tanggalPilihan!.year == now.year &&
+          tanggalPilihan!.month == now.month &&
+          tanggalPilihan!.day == now.day;
+
+      if (today) {
+        final waktuSekarang = TimeOfDay.now();
+        waktuTersedia = waktuTersedia.where((schedule) {
+          final jam = schedule['time'].toString().split(':');
+          if (jam.length == 2) {
+            final hour = int.tryParse(jam[0]) ?? 0;
+            final minute = int.tryParse(jam[1]) ?? 0;
+
+            // Compare with current time
+            if (hour > waktuSekarang.hour) {
+              return true;
+            } else if (hour == waktuSekarang.hour &&
+                minute > waktuSekarang.minute) {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        }).toList();
+      }
     }
   }
 
@@ -247,18 +282,40 @@ class OrderPageState extends State<OrderPage> {
                   );
                 }).toList(),
                 onChanged: rutePilihan == null
-                ? null
-                : (String? value) {
-                  setState(() {
-                    waktuPilihan = value;
-                  });
-                },
+                    ? null
+                    : (String? value) {
+                        setState(() {
+                          waktuPilihan = value;
+                        });
+                      },
               ),
             ),
           ),
+
+          // Tombol Order Tiket
           const SizedBox(height: 40),
 
-          
+          SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              onPressed: () {
+                // Function will be added later
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.secondary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Order Now',
+                style: AppTextStyles.mainFont25.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
