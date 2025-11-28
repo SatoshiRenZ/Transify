@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'pages/homepage/home_page.dart';
-import 'pages/order_page.dart';
-// import 'pages/history_page.dart';
+import 'pages/orderpage/order_page.dart';
+import 'pages/historypage/history_page.dart';
 // import 'pages/profile_page.dart';
 // import 'pages/login_page.dart';
 // import 'pages/signup_page.dart';
@@ -45,9 +45,9 @@ class MyApp extends StatelessWidget {
         '/order':
           (context) =>
             const OrderPage(),
-        // '/history':
-        //   (context) =>
-        //     const HistoryPage(),
+        '/history':
+          (context) =>
+            const HistoryPage(),
         // '/profile':
         //   (context) =>
         //     const ProfilePage(),
