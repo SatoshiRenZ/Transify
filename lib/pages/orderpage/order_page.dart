@@ -204,6 +204,61 @@ class OrderPageState extends State<OrderPage> {
             ),
           ),
           const SizedBox(height: 20),
+
+          // Memilih Jam Keberangkatan
+          Text('Pilih Jam keberangkatan', style: AppTextStyles.mainFont20),
+          const SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.box,
+              border: Border.all(
+                color: rutePilihan == null ? Colors.grey : AppColors.secondary,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: waktuPilihan,
+                hint: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    rutePilihan == null
+                        ? 'Mohon Pilih Rute Terlebih Dahulu'
+                        : 'Pilih Jam Keberangkatanmu',
+                    style: AppTextStyles.mainFont15.copyWith(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                icon: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Icon(Icons.arrow_drop_down, color: AppColors.mainText),
+                ),
+                style: AppTextStyles.mainFont15,
+                items: waktuTersedia.map((schedule) {
+                  return DropdownMenuItem<String>(
+                    value: schedule['time'],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('${schedule['name']} - ${schedule['time']}'),
+                    ),
+                  );
+                }).toList(),
+                onChanged: rutePilihan == null
+                ? null
+                : (String? value) {
+                  setState(() {
+                    waktuPilihan = value;
+                  });
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
+
+          
         ],
       ),
     );
