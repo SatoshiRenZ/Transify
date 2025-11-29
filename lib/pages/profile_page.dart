@@ -1,15 +1,56 @@
 import 'package:flutter/material.dart';
-import '../styles/profile_style.dart'; 
-import '../widgets/widget_prof.dart';
-import '../template/temp_profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfilePage extends StatelessWidget {
+import '../styles/profile_style.dart'; 
+import '../template/temp_profile.dart';
+import '../widgets/profiletextfield.dart';
+
+
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
-  // Widget Builder for the content that goes inside the AppTemplate
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  // Text Controllers for storage
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedProfile();
+  }
+
+  Future<void> _loadSavedProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      nameController.text = prefs.getString("profile_name") ?? "";
+      passwordController.text = prefs.getString("profile_password") ?? "";
+      emailController.text = prefs.getString("profile_email") ?? "";
+    });
+  }
+
+  Future<void> _saveProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString("profile_name", nameController.text);
+    await prefs.setString("profile_password", passwordController.text);
+    await prefs.setString("profile_email", emailController.text);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile saved locally")),
+    );
+  }
+
+  // Your existing builder
   Widget _buildPageContent() {
     final AppColor style = AppColor();
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
       child: Column(
@@ -26,7 +67,6 @@ class ProfilePage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        // Orange Circle Avatar
         const CircleAvatar(
           radius: 30,
           backgroundColor: AppColor.primaryOrange,
@@ -37,8 +77,12 @@ class ProfilePage extends StatelessWidget {
           children: <Widget>[
             Text('User', style: style.mainFontLarge.copyWith(fontSize: 22)),
             Text(
-              'user.123@gmail.com', 
-              style: style.mainFontMedium.copyWith(color: AppColor.mainTextColor.withOpacity(0.6)) // Use a slightly subdued color
+              emailController.text.isEmpty
+                  ? 'user.123@gmail.com'
+                  : emailController.text,
+              style: style.mainFontMedium.copyWith(
+                color: AppColor.mainTextColor.withOpacity(0.6),
+              ),
             ),
           ],
         ),
@@ -63,50 +107,74 @@ class ProfilePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // Title: Edit Profile
-          Text('Edit Profile', style: style.mainFontMedium.copyWith(fontWeight: FontWeight.bold)),
+          Text('Edit Profile',
+              style: style.mainFontMedium.copyWith(fontWeight: FontWeight.bold)),
           Divider(color: AppColor.mainTextColor.withOpacity(0.5)),
           const SizedBox(height: 10),
 
-          // Text Fields 
-          const ProfileTextField(labelText: 'Name', hintText: 'Full name'),
-          const SizedBox(height: 20),
-          const ProfileTextField(labelText: 'Password', hintText: '********', isPassword: true),
-          const SizedBox(height: 20),
-          const ProfileTextField(labelText: 'Email', hintText: 'example.email@gmail.com'),
+          // Inject controllers
+          ProfileTextField(
+            labelText: 'Name',
+            hintText: 'Full name',
+            controller: nameController,
+          ),
           const SizedBox(height: 20),
 
-          // Links
+          ProfileTextField(
+            labelText: 'Password',
+            hintText: '********',
+            isPassword: true,
+            controller: passwordController,
+          ),
+          const SizedBox(height: 20),
+
+          ProfileTextField(
+            labelText: 'Email',
+            hintText: 'example.email@gmail.com',
+            controller: emailController,
+          ),
+          const SizedBox(height: 20),
+
           GestureDetector(
-            onTap: () { /* Handle Logout */ },
+            onTap: () {},
             child: Text(
-              'Logout', 
-              style: style.mainFontMedium.copyWith(color: AppColor.primaryOrange, decoration: TextDecoration.underline)
+              'Logout',
+              style: style.mainFontMedium.copyWith(
+                color: AppColor.primaryOrange,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
           const SizedBox(height: 10),
+
           GestureDetector(
-            onTap: () { /* Handle Delete Account */ },
+            onTap: () {},
             child: Text(
-              'Delete Account', 
-              style: style.mainFontMedium.copyWith(color: AppColor.primaryOrange, decoration: TextDecoration.underline)
+              'Delete Account',
+              style: style.mainFontMedium.copyWith(
+                color: AppColor.primaryOrange,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
           const SizedBox(height: 30),
 
-          // Edit Profile Button
           SizedBox(
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () { /* Handle profile update */ },
+              onPressed: _saveProfile, // Save button
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColor.primaryOrange,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
               child: Text(
-                'Edit Profile', 
-                style: style.mainFontMedium.copyWith(color: AppColor.mainTextColor, fontWeight: FontWeight.bold)
+                'Edit Profile',
+                style: style.mainFontMedium.copyWith(
+                  color: AppColor.mainTextColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -117,7 +185,6 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Wrap the page content with the AppTemplate
     return AppTemplate(
       bodyWidget: _buildPageContent(),
     );

@@ -5,7 +5,7 @@ import 'pages/order_page.dart';
 import 'pages/profile_page.dart';
 
 // import 'pages/history_page.dart';
-// import 'pages/profile_page.dart';
+import 'pages/profile_page.dart';
 // import 'pages/login_page.dart';
 // import 'pages/signup_page.dart';
 import '../styles/style.dart';
