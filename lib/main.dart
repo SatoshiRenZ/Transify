@@ -8,7 +8,7 @@ import 'pages/homepage/home_page.dart';
 import 'pages/orderpage/order_page.dart';
 import 'pages/orderpage/ticket_page.dart';
 import 'pages/historypage/history_page.dart';
-//import 'pages/profile_page.dart';
+import 'pages/profile_page.dart';
 import 'pages/login_page.dart';
 import 'pages/signup_page.dart';
 import '../styles/style.dart';
@@ -55,9 +55,9 @@ class MyApp extends StatelessWidget {
         '/history':
           (context) =>
           const HistoryPage(),
-        // '/profile':
-        //   (context) =>
-        //     const ProfilePage(),
+        '/profile':
+          (context) =>
+            const ProfilePage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/ticket') {
