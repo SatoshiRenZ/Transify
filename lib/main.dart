@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+import '../styles/style.dart';
+
 import 'pages/homepage/home_page.dart';
 import 'pages/orderpage/order_page.dart';
+import 'pages/orderpage/ticket_page.dart';
 import 'pages/historypage/history_page.dart';
 // import 'pages/profile_page.dart';
 // import 'pages/login_page.dart';
 // import 'pages/signup_page.dart';
-import '../styles/style.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: AppColors.primary,
       ),
-            
+
       initialRoute: '/home',
       routes: {
         // '/login':
@@ -39,18 +42,22 @@ class MyApp extends StatelessWidget {
         // '/signup':
         //   (context) =>
         //     const SignupPage(),
-        '/home': 
-          (context) => 
-            const HomePage(),
-        '/order':
-          (context) =>
-            const OrderPage(),
-        '/history':
-          (context) =>
-            const HistoryPage(),
+        '/home': (context) => const HomePage(),
+        '/order': (context) => const OrderPage(),
+        '/ticket': (context) => const TicketPage(),
+        '/history': (context) => const HistoryPage(),
         // '/profile':
         //   (context) =>
         //     const ProfilePage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/ticket') {
+          return MaterialPageRoute(
+            builder: (context) => const TicketPage(),
+            settings: settings,
+          );
+        }
+        return null;
       },
       debugShowCheckedModeBanner: false,
     );

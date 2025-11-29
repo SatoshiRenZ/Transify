@@ -38,6 +38,11 @@ class AppTextStyles
     fontSize: 15,
     color: AppColors.mainText,
   );
+
+  static final TextStyle mainFont12 = GoogleFonts.sulphurPoint(
+    fontSize: 12,
+    color: AppColors.mainText,
+  );
 }
 
 class AppIcons

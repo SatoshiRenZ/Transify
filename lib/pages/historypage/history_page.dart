@@ -10,7 +10,7 @@ class HistoryPage extends StatefulWidget {
 }
 
 class HistoryPageState extends State<HistoryPage> {
-  int currentIndex = 1; // Karena ini halaman Order/Jadwal
+  int currentIndex = 2; // Karena ini halaman Order/Jadwal
 
   void onItemTapped(int index) {
     final String? currentRoute = ModalRoute.of(context)?.settings.name;

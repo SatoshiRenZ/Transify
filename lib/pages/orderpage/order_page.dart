@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../template/template.dart';
 import '../../styles/style.dart';
+import '../../models/model_order.dart';
 import 'dart:convert';
 
 class OrderPage extends StatefulWidget {
@@ -105,7 +106,7 @@ class OrderPageState extends State<OrderPage> {
             final hour = int.tryParse(jam[0]) ?? 0;
             final minute = int.tryParse(jam[1]) ?? 0;
 
-            // Compare with current time
+            // Membandingkan waktu dengan waktu sekarang
             if (hour > waktuSekarang.hour) {
               return true;
             } else if (hour == waktuSekarang.hour &&
@@ -300,7 +301,62 @@ class OrderPageState extends State<OrderPage> {
             height: 55,
             child: ElevatedButton(
               onPressed: () {
-                // Function will be added later
+                if (rutePilihan == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Mohon pilih rute terlebih dahulu',
+                        style: AppTextStyles.mainFont15,
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                if (tanggalPilihan == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Mohon pilih tanggal terlebih dahulu',
+                        style: AppTextStyles.mainFont15,
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                if (waktuPilihan == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Mohon pilih waktu terlebih dahulu',
+                        style: AppTextStyles.mainFont15,
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                // Mengambil nama bus dari waktu yang dipilih
+                final selectedSchedule = waktuTersedia.firstWhere(
+                  (schedule) => schedule['time'] == waktuPilihan,
+                );
+
+                // Membuat OrderModel
+                final order = OrderModel(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  rute: rutePilihan!,
+                  tanggal: tanggalPilihan!,
+                  waktu: waktuPilihan!,
+                  nomorBus: selectedSchedule['name'],
+                  tanggalPesan: DateTime.now(),
+                );
+
+                // Navigasi ke halaman tiket
+                Navigator.pushNamed(context, '/ticket', arguments: order);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.secondary,
@@ -309,7 +365,7 @@ class OrderPageState extends State<OrderPage> {
                 ),
               ),
               child: Text(
-                'Order Now',
+                'Get Ticket Now',
                 style: AppTextStyles.mainFont25.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
