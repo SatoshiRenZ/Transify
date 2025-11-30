@@ -11,7 +11,6 @@ import 'pages/historypage/history_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/login_page.dart';
 import 'pages/signup_page.dart';
-import '../styles/style.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

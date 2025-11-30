@@ -160,7 +160,7 @@ class OrderPageState extends State<OrderPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Pilih Jadwal Keberangkatan', style: AppTextStyles.title),
+          Text('Pilih Jadwal Keberangkatan', style: AppTextStyles.mainFont35),
           const SizedBox(height: 30),
 
           // Memilih Rute Bus

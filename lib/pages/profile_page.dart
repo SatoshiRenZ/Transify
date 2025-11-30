@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../styles/profile_style.dart'; 
-import '../template/temp_profile.dart';
-import '../widgets/profiletextfield.dart';
-
+import '../styles/style.dart';
+import '../widgets/widget_prof.dart';
+import '../template/template.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -43,45 +42,55 @@ class _ProfilePageState extends State<ProfilePage> {
     await prefs.setString("profile_email", emailController.text);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile saved locally")),
+      SnackBar(
+        content: Text(
+          "Profile saved locally",
+          style: AppTextStyles.mainFont15.copyWith(color: Colors.white),
+        ),
+        backgroundColor: AppColors.secondary,
+      ),
     );
   }
 
   // Your existing builder
   Widget _buildPageContent() {
-    final AppColor style = AppColor();
-
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
       child: Column(
         children: <Widget>[
-          _buildUserHeader(style),
+          _buildUserHeader(),
           const SizedBox(height: 30),
-          _buildProfileCard(style),
+          _buildProfileCard(),
         ],
       ),
     );
   }
 
-  Widget _buildUserHeader(AppColor style) {
+  Widget _buildUserHeader() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const CircleAvatar(
+        CircleAvatar(
           radius: 30,
-          backgroundColor: AppColor.primaryOrange,
+          backgroundColor: AppColors.secondary,
+          child: Icon(Icons.person, size: 35, color: AppColors.mainText),
         ),
         const SizedBox(width: 15),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('User', style: style.mainFontLarge.copyWith(fontSize: 22)),
+            Text(
+              nameController.text.isEmpty ? 'User' : nameController.text,
+              style: AppTextStyles.mainFont25.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             Text(
               emailController.text.isEmpty
                   ? 'user.123@gmail.com'
                   : emailController.text,
-              style: style.mainFontMedium.copyWith(
-                color: AppColor.mainTextColor.withOpacity(0.6),
+              style: AppTextStyles.mainFont15.copyWith(
+                color: AppColors.mainText.withOpacity(0.6),
               ),
             ),
           ],
@@ -90,26 +99,30 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileCard(AppColor style) {
+  Widget _buildProfileCard() {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: AppColor.backgroundYellow,
+        color: AppColors.box,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: AppColor.mainTextColor.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+            color: AppColors.mainText.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Edit Profile',
-              style: style.mainFontMedium.copyWith(fontWeight: FontWeight.bold)),
-          Divider(color: AppColor.mainTextColor.withOpacity(0.5)),
+          Text(
+            'Edit Profile',
+            style: AppTextStyles.mainFont20.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Divider(color: AppColors.mainText.withOpacity(0.3)),
           const SizedBox(height: 10),
 
           // Inject controllers
@@ -136,24 +149,30 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 20),
 
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              // TODO: Implement logout functionality
+            },
             child: Text(
               'Logout',
-              style: style.mainFontMedium.copyWith(
-                color: AppColor.primaryOrange,
+              style: AppTextStyles.mainFont15.copyWith(
+                color: AppColors.hover,
                 decoration: TextDecoration.underline,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
           const SizedBox(height: 10),
 
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              // TODO: Implement delete account functionality
+            },
             child: Text(
               'Delete Account',
-              style: style.mainFontMedium.copyWith(
-                color: AppColor.primaryOrange,
+              style: AppTextStyles.mainFont15.copyWith(
+                color: Colors.red,
                 decoration: TextDecoration.underline,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -163,16 +182,17 @@ class _ProfilePageState extends State<ProfilePage> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: _saveProfile, // Save button
+              onPressed: _saveProfile,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primaryOrange,
+                backgroundColor: AppColors.secondary,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: Text(
-                'Edit Profile',
-                style: style.mainFontMedium.copyWith(
-                  color: AppColor.mainTextColor,
+                'Save Profile',
+                style: AppTextStyles.mainFont15.copyWith(
+                  color: AppColors.mainText,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -183,10 +203,36 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void onItemTapped(int index) {
+    final String? currentRoute = ModalRoute.of(context)?.settings.name;
+    String destinationRoute;
+    switch (index) {
+      case 0:
+        destinationRoute = '/home';
+        break;
+      case 1:
+        destinationRoute = '/order';
+        break;
+      case 2:
+        destinationRoute = '/history';
+        break;
+      case 3:
+        destinationRoute = '/profile';
+        break;
+      default:
+        return;
+    }
+    if (currentRoute != destinationRoute) {
+      Navigator.pushReplacementNamed(context, destinationRoute);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AppTemplate(
-      bodyWidget: _buildPageContent(),
+    return TemplatePage(
+      currentIndex: 3, // Profile page is at index 3
+      onIndexChanged: onItemTapped,
+      child: SafeArea(child: _buildPageContent()),
     );
   }
 }
