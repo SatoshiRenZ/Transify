@@ -1,35 +1,41 @@
 import 'package:flutter/material.dart';
 import '../styles/style.dart';
 
-class ProfileTextField extends StatelessWidget {
+class ProfileTextField extends StatefulWidget
+{
   final String labelText;
-  final String hintText;
   final bool isPassword;
   final TextEditingController? controller;
 
   const ProfileTextField({
     super.key,
     required this.labelText,
-    required this.hintText,
     this.isPassword = false,
     this.controller,
   });
 
   @override
-  Widget build(BuildContext context) {
+  State<ProfileTextField> createState() => _ProfileTextFieldState();
+}
+
+class _ProfileTextFieldState extends State<ProfileTextField>
+{
+  bool _isPasswordVisible = false;
+
+  @override
+  Widget build(BuildContext context)
+  {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('$labelText :', style: AppTextStyles.mainFont15),
+        Text('${widget.labelText} :', style: AppTextStyles.mainFont15),
         const SizedBox(height: 5),
         TextField(
-          controller: controller,
-          obscureText: isPassword,
+          controller: widget.controller,
+          
+          obscureText: widget.isPassword ? !_isPasswordVisible : false,
+          
           decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: AppTextStyles.mainFont12.copyWith(
-              color: AppColors.mainText.withOpacity(0.5),
-            ),
             enabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(
                 color: AppColors.secondary,
@@ -45,13 +51,21 @@ class ProfileTextField extends StatelessWidget {
               horizontal: 10,
               vertical: 10,
             ),
-            suffixIcon: isPassword
-                ? Padding(
+            
+            suffixIcon: widget.isPassword
+                ? IconButton(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: Icon(
-                      Icons.remove_red_eye_outlined,
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                       color: AppColors.mainText,
                     ),
+                    onPressed: ()
+                    {
+                      setState(()
+                      {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
                   )
                 : null,
           ),

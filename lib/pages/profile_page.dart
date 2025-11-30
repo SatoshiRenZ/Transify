@@ -5,36 +5,68 @@ import '../styles/style.dart';
 import '../widgets/widget_prof.dart';
 import '../template/template.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatefulWidget
+{
   const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  // Text Controllers for storage
+class _ProfilePageState extends State<ProfilePage>
+{
   final TextEditingController nameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
+  bool _isLoggedIn = false;
+  bool _isLoading = true;
+
   @override
-  void initState() {
+  void initState()
+  {
     super.initState();
-    _loadSavedProfile();
+    _checkLoginStatus();
   }
 
-  Future<void> _loadSavedProfile() async {
+  Future<void> _checkLoginStatus() async
+  {
     final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool("isLoggedIn") ?? false;
 
-    setState(() {
+    if (!isLoggedIn)
+    {
+      if (mounted)
+      {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    }
+    else
+    {
+      await _loadSavedProfile(prefs);
+      if (mounted)
+      {
+        setState(()
+        {
+          _isLoggedIn = true;
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadSavedProfile(SharedPreferences prefs) async
+  {
+    setState(()
+    {
       nameController.text = prefs.getString("profile_name") ?? "";
       passwordController.text = prefs.getString("profile_password") ?? "";
       emailController.text = prefs.getString("profile_email") ?? "";
     });
   }
 
-  Future<void> _saveProfile() async {
+  Future<void> _saveProfile() async
+  {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setString("profile_name", nameController.text);
@@ -44,16 +76,41 @@ class _ProfilePageState extends State<ProfilePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          "Profile saved locally",
-          style: AppTextStyles.mainFont15.copyWith(color: Colors.white),
+          "Profile saved!",
+          style: AppTextStyles.mainFont15.copyWith(color: AppColors.box),
         ),
         backgroundColor: AppColors.secondary,
       ),
     );
   }
+  
+  Future<void> _handleLogout() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("isLoggedIn", false); 
 
-  // Your existing builder
-  Widget _buildPageContent() {
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
+  }
+
+  Future<void> _handleDeleteAccount() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    
+    await prefs.clear();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Account successfully deleted. You have been logged out.")),
+    );
+
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
+  }
+
+  Widget _buildPageContent()
+  {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
       child: Column(
@@ -66,7 +123,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildUserHeader() {
+  Widget _buildUserHeader()
+  {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -90,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ? 'user.123@gmail.com'
                   : emailController.text,
               style: AppTextStyles.mainFont15.copyWith(
-                color: AppColors.mainText.withOpacity(0.6),
+                color: AppColors.mainText,
               ),
             ),
           ],
@@ -99,7 +157,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileCard() {
+  Widget _buildProfileCard()
+  {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
@@ -107,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: AppColors.mainText.withOpacity(0.1),
+            color: AppColors.mainText,
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -122,20 +181,17 @@ class _ProfilePageState extends State<ProfilePage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Divider(color: AppColors.mainText.withOpacity(0.3)),
+          Divider(color: AppColors.mainText),
           const SizedBox(height: 10),
 
-          // Inject controllers
           ProfileTextField(
             labelText: 'Name',
-            hintText: 'Full name',
             controller: nameController,
           ),
           const SizedBox(height: 20),
 
           ProfileTextField(
             labelText: 'Password',
-            hintText: '********',
             isPassword: true,
             controller: passwordController,
           ),
@@ -143,15 +199,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
           ProfileTextField(
             labelText: 'Email',
-            hintText: 'example.email@gmail.com',
             controller: emailController,
           ),
           const SizedBox(height: 20),
 
           GestureDetector(
-            onTap: () {
-              // TODO: Implement logout functionality
-            },
+            onTap: _handleLogout,
             child: Text(
               'Logout',
               style: AppTextStyles.mainFont15.copyWith(
@@ -164,9 +217,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 10),
 
           GestureDetector(
-            onTap: () {
-              // TODO: Implement delete account functionality
-            },
+            onTap: _handleDeleteAccount,
             child: Text(
               'Delete Account',
               style: AppTextStyles.mainFont15.copyWith(
@@ -203,7 +254,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void onItemTapped(int index) {
+  void onItemTapped(int index)
+  {
     final String? currentRoute = ModalRoute.of(context)?.settings.name;
     String destinationRoute;
     switch (index) {
@@ -222,15 +274,24 @@ class _ProfilePageState extends State<ProfilePage> {
       default:
         return;
     }
-    if (currentRoute != destinationRoute) {
+    if (currentRoute != destinationRoute)
+    {
       Navigator.pushReplacementNamed(context, destinationRoute);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
+    if (_isLoading)
+    {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator(color: AppColors.secondary)), 
+      );
+    }
+    
     return TemplatePage(
-      currentIndex: 3, // Profile page is at index 3
+      currentIndex: 3,
       onIndexChanged: onItemTapped,
       child: SafeArea(child: _buildPageContent()),
     );
