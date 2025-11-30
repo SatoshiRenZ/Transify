@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../template/template.dart';
 import '../../styles/style.dart';
+import '../../providers/order_provider.dart';
+import '../../models/model_order.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -10,7 +14,7 @@ class HistoryPage extends StatefulWidget {
 }
 
 class HistoryPageState extends State<HistoryPage> {
-  int currentIndex = 2; // Karena ini halaman Order/Jadwal
+  int currentIndex = 2; // History page is at index 2
 
   void onItemTapped(int index) {
     final String? currentRoute = ModalRoute.of(context)?.settings.name;
@@ -20,7 +24,7 @@ class HistoryPageState extends State<HistoryPage> {
         destinationRoute = '/home';
         break;
       case 1:
-        destinationRoute = '/order'; // Route untuk halaman ini
+        destinationRoute = '/order';
         break;
       case 2:
         destinationRoute = '/history';
@@ -41,79 +45,212 @@ class HistoryPageState extends State<HistoryPage> {
     return TemplatePage(
       currentIndex: currentIndex,
       onIndexChanged: onItemTapped,
-      child: buildScheduleContent(),
+      child: buildHistoryContent(),
     );
   }
 
-  Widget buildScheduleContent() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header: Judul & Tujuan
-          Text(
-            'Jadwal Bis',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+  Widget buildHistoryContent() {
+    return Consumer<OrderProvider>(
+      builder: (context, orderProvider, child) {
+        final orders = orderProvider.orders;
+
+        if (orders.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.history,
+                    size: 100,
+                    color: AppColors.mainText.withOpacity(0.3),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Belum Ada Riwayat Pesanan',
+                    style: AppTextStyles.mainFont25.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Pesanan tiket Anda akan muncul di sini',
+                    style: AppTextStyles.mainFont15.copyWith(
+                      color: AppColors.mainText.withOpacity(0.6),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/order');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.secondary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'Pesan Tiket Sekarang',
+                      style: AppTextStyles.mainFont15.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Row(
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Tujuan akhir : ',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+                'Riwayat Pesanan',
+                style: AppTextStyles.mainFont35.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
-              _buildDestinationChip('PIK Avenue'),
-              const SizedBox(width: 8),
-              _buildDestinationChip('Tokyo Riverside'),
+              const SizedBox(height: 10),
+              Text(
+                '${orders.length} Tiket',
+                style: AppTextStyles.mainFont15.copyWith(
+                  color: AppColors.mainText.withOpacity(0.6),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: orders.length,
+                  itemBuilder: (context, index) {
+                    final order = orders[index];
+                    return _buildTicketCard(order);
+                  },
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Daftar Jadwal
-          Expanded(
-            child: ListView.builder(
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                final schedule = _getScheduleData(index);
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  elevation: 0,
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.directions_bus,
-                      color: Colors.blue[800],
-                      size: 32,
-                    ),
-                    title: Text(
-                      '${schedule['route']}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[800],
+        );
+      },
+    );
+  }
+
+  Widget _buildTicketCard(OrderModel order) {
+    final formatTanggal = DateFormat('dd MMM yyyy', 'id');
+    final formatTanggalPesan = DateFormat('dd MMM yyyy HH:mm', 'id');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: AppColors.box,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: AppColors.secondary, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mainText.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: AppColors.secondary,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(13),
+                topRight: Radius.circular(13),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.confirmation_number,
+                  color: AppColors.mainText,
+                  size: 24,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.nomorTicket,
+                        style: AppTextStyles.mainFont20.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    subtitle: Text(
-                      'Keberangkatan pukul ${schedule['time']}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.orange[700],
+                      Text(
+                        'Dipesan: ${formatTanggalPesan.format(order.tanggalPesan)}',
+                        style: AppTextStyles.mainFont15.copyWith(fontSize: 12),
                       ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'GRATIS',
+                    style: AppTextStyles.mainFont15.copyWith(
+                      fontSize: 12,
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                );
-              },
+                ),
+              ],
+            ),
+          ),
+
+          // Body
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: [
+                _buildInfoRow(
+                  icon: Icons.route,
+                  label: 'Rute',
+                  value: order.rute,
+                ),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                  icon: Icons.calendar_today,
+                  label: 'Tanggal',
+                  value: formatTanggal.format(order.tanggal),
+                ),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                  icon: Icons.access_time,
+                  label: 'Waktu',
+                  value: order.waktu,
+                ),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                  icon: Icons.directions_bus,
+                  label: 'Bus',
+                  value: order.nomorBus,
+                ),
+              ],
             ),
           ),
         ],
@@ -121,59 +258,36 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget _buildDestinationChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.orange[50],
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.orange[800],
-          fontWeight: FontWeight.w500,
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.secondary, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: AppTextStyles.mainFont15.copyWith(
+                  fontSize: 12,
+                  color: AppColors.mainText.withOpacity(0.6),
+                ),
+              ),
+              Text(
+                value,
+                style: AppTextStyles.mainFont15.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
-  }
-
-  Map<String, String> _getScheduleData(int index) {
-    final List<Map<String, String>> data = [
-      {
-        'route': 'Tokyo Riverside - PIK Avenue',
-        'time': '20:40',
-      },
-      {
-        'route': 'PIK Avenue - Tokyo Riverside',
-        'time': '20:59',
-      },
-      {
-        'route': 'Tokyo Riverside - PIK Avenue',
-        'time': '21:00',
-      },
-      {
-        'route': 'PIK Avenue - Tokyo Riverside',
-        'time': '21:15', // Contoh tambahan
-      },
-      {
-        'route': 'PIK Avenue - Tokyo Riverside',
-        'time': '11:45',
-      },
-      {
-        'route': 'Tokyo Riverside - PIK Avenue',
-        'time': '12:30',
-      },
-      {
-        'route': 'PIK Avenue - Tokyo Riverside',
-        'time': '13:15',
-      },
-      {
-        'route': 'Tokyo Riverside - PIK Avenue',
-        'time': '14:00',
-      }
-    ];
-    return data[index];
   }
 }

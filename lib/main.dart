@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
 import '../styles/style.dart';
+import 'providers/order_provider.dart';
 
 import 'pages/homepage/home_page.dart';
 import 'pages/orderpage/order_page.dart';
@@ -19,7 +21,12 @@ void main() async {
     GoogleFonts.irishGrover(),
     GoogleFonts.sulphurPoint(),
   ]);
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => OrderProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -36,27 +43,13 @@ class MyApp extends StatelessWidget {
 
       initialRoute: '/home',
       routes: {
-        '/login':
-          (context) =>
-          const LoginPage(),
-        '/signup':
-          (context) =>
-          const SignupPage(),
-        '/home': 
-          (context) =>
-          const HomePage(),
-        '/order':
-          (context) =>
-          const OrderPage(),
-        '/ticket':
-          (context) =>
-          const TicketPage(),
-        '/history':
-          (context) =>
-          const HistoryPage(),
-        '/profile':
-          (context) =>
-            const ProfilePage(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/home': (context) => const HomePage(),
+        '/order': (context) => const OrderPage(),
+        '/ticket': (context) => const TicketPage(),
+        '/history': (context) => const HistoryPage(),
+        '/profile': (context) => const ProfilePage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/ticket') {

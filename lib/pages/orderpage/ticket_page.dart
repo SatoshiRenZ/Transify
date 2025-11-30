@@ -2,23 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../styles/style.dart';
 import '../../models/model_order.dart';
-import 'dart:math';
 
 class TicketPage extends StatelessWidget {
   const TicketPage({Key? key}) : super(key: key);
 
-  // Generate Nomor Tiket
-  String generatenomorTicket() {
-    final random = Random();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final randomNum = random.nextInt(9999);
-    return 'TRF${timestamp.toString().substring(7)}$randomNum';
-  }  
-
   @override
   Widget build(BuildContext context) {
     final order = ModalRoute.of(context)!.settings.arguments as OrderModel;
-    final nomorTicket = generatenomorTicket();
     final formatTanggal = DateFormat('dd MMMM yyyy', 'id');
 
     return Scaffold(
@@ -130,7 +120,7 @@ class TicketPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'No. Tiket: $nomorTicket',
+                                'No. Tiket: ${order.nomorTicket}',
                                 style: AppTextStyles.mainFont20.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -269,7 +259,7 @@ class TicketPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 15),
-                    
+
                     // Button Ke Riwayat
                     Expanded(
                       child: ElevatedButton(
@@ -336,7 +326,6 @@ class TicketPage extends StatelessWidget {
     );
   }
 }
-
 
 // Garis Putus-Putus Pembatas
 class DashedLinePainter extends CustomPainter {
