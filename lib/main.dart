@@ -13,6 +13,7 @@ import 'pages/historypage/history_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/login_page.dart';
 import 'pages/signup_page.dart';
+import 'auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,15 +42,32 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.primary,
       ),
 
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
-        '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignupPage(),
-        '/home': (context) => const HomePage(),
-        '/order': (context) => const OrderPage(),
-        '/ticket': (context) => const TicketPage(),
-        '/history': (context) => const HistoryPage(),
-        '/profile': (context) => const ProfilePage(),
+        '/':
+          (context) =>
+          const AuthCheckPage(),
+        '/login':
+          (context) =>
+          const LoginPage(),
+        '/signup':
+          (context) =>
+          const SignupPage(),
+        '/home': 
+          (context) =>
+          const HomePage(),
+        '/order':
+          (context) =>
+          const OrderPage(),
+        '/ticket':
+          (context) =>
+          const TicketPage(),
+        '/history':
+          (context) =>
+          const HistoryPage(),
+        '/profile':
+          (context) =>
+            const ProfilePage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/ticket') {
