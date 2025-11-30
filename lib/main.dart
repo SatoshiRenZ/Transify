@@ -11,6 +11,7 @@ import 'pages/historypage/history_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/login_page.dart';
 import 'pages/signup_page.dart';
+import 'auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,8 +35,11 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.primary,
       ),
 
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
+        '/':
+          (context) =>
+          const AuthCheckPage(),
         '/login':
           (context) =>
           const LoginPage(),
