@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../template/template.dart';
 import '../../styles/style.dart';
 import '../../models/model_order.dart';
+import '../../providers/order_provider.dart';
 import 'dart:convert';
+import 'dart:math';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -300,7 +303,7 @@ class OrderPageState extends State<OrderPage> {
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (rutePilihan == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -345,6 +348,13 @@ class OrderPageState extends State<OrderPage> {
                   (schedule) => schedule['time'] == waktuPilihan,
                 );
 
+                // Generate nomor tiket
+                final random = Random();
+                final timestamp = DateTime.now().millisecondsSinceEpoch;
+                final randomNum = random.nextInt(9999);
+                final nomorTicket =
+                    'TRF${timestamp.toString().substring(7)}$randomNum';
+
                 // Membuat OrderModel
                 final order = OrderModel(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -353,7 +363,14 @@ class OrderPageState extends State<OrderPage> {
                   waktu: waktuPilihan!,
                   nomorBus: selectedSchedule['name'],
                   tanggalPesan: DateTime.now(),
+                  nomorTicket: nomorTicket,
                 );
+
+                // Simpan order ke provider
+                await Provider.of<OrderProvider>(
+                  context,
+                  listen: false,
+                ).addOrder(order);
 
                 // Navigasi ke halaman tiket
                 Navigator.pushNamed(context, '/ticket', arguments: order);

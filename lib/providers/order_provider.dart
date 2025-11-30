@@ -20,15 +20,37 @@ class OrderProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final String? ordersJson = prefs.getString(_storageKey);
 
-      if (ordersJson != null) {
-        final List<dynamic> ordersList = json.decode(ordersJson);
-        _orders = ordersList.map((item) => OrderModel.fromMap(item)).toList();
-        notifyListeners();
+      if (ordersJson != null && ordersJson.isNotEmpty) {
+        try {
+          final List<dynamic> ordersList = json.decode(ordersJson);
+          _orders = ordersList
+              .map((item) {
+                try {
+                  return OrderModel.fromMap(item as Map<String, dynamic>);
+                } catch (e) {
+                  if (kDebugMode) {
+                    print('Error parsing individual order: $e');
+                  }
+                  return null;
+                }
+              })
+              .whereType<OrderModel>()
+              .toList();
+          notifyListeners();
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error decoding orders JSON, clearing storage: $e');
+          }
+          // Clear corrupt data
+          await prefs.remove(_storageKey);
+          _orders = [];
+        }
       }
     } catch (e) {
       if (kDebugMode) {
         print('Error loading orders: $e');
       }
+      _orders = [];
     }
   }
 

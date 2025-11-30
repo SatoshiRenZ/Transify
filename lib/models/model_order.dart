@@ -5,6 +5,7 @@ class OrderModel {
   final String waktu;
   final String nomorBus;
   final DateTime tanggalPesan;
+  final String nomorTicket;
 
   OrderModel({
     required this.id,
@@ -13,6 +14,7 @@ class OrderModel {
     required this.waktu,
     required this.nomorBus,
     required this.tanggalPesan,
+    required this.nomorTicket,
   });
 
   // Diubah menjadi Map untuk penyimpanan
@@ -24,6 +26,7 @@ class OrderModel {
       'waktu': waktu,
       'nomorBus': nomorBus,
       'tanggalPesan': tanggalPesan.toIso8601String(),
+      'nomorTicket': nomorTicket,
     };
   }
 
@@ -36,6 +39,9 @@ class OrderModel {
       waktu: map['waktu'] as String,
       nomorBus: map['nomorBus'] as String,
       tanggalPesan: DateTime.parse(map['tanggalPesan'] as String),
+      nomorTicket:
+          map['nomorTicket'] as String? ??
+          'TRF-LEGACY', // Default untuk data lama
     );
   }
 }
